@@ -8,7 +8,7 @@ Requires OpenTX version 2.1.x
 * Announcement frequency increases as the battery drains
 
 ### Overview
-When a battery has current drawn from it, the voltage across the battery drops. This means the values relayed by battery voltage sensors such as FrSky's VLSS will fall as the throttle is increased, leading to false warnings on the transmitter. This script gets round this problem by only analyzing the cell values when the throttle is below a certain theshhold (by default 10%). This also makes the script easy to invoke: you just reduce the throttle to  below the configured threshold.
+When a battery has current drawn from it, the voltage across the battery drops. This means the values relayed by battery voltage sensors (such as FrSky's VLSS) will fall as the throttle is increased, leading to false warnings on the transmitter. This script gets round this problem by only analyzing the cell values when the throttle is below a certain theshhold (by default 10%). This also makes the script easy to invoke: you just reduce the throttle to  below the configured threshold. The script takes into account telemetry lag by measuring cell voltages for approximately 500ms after checking is invoked.  
 
 #### Inputs
 * Cells - You can set the number of cells in your battery via this parameter, and if the transmitter receives a different number, the script will complain via its status code (see below) and issue a low-piched beep. Setting this value to zero (the default) disables cell count checking.
@@ -42,7 +42,7 @@ charge > 30%,  max one announcement every 10 seconds
 charge < 30%,  max one announcement every  5 seconds
 ```
 
-Finally, if there is a change in the status_code, then an annoncement is also made.
+Finally, if there is a change in the status code or the blackout period changes, then an annoncement is also made.
 
 Enjoy.
 
