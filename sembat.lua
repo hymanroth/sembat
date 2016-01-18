@@ -1,3 +1,10 @@
+--[[
+ script:  sembat.lua 
+ author:  David Semeria
+ version: 1.0
+ license: GNU General Public License version 2
+--]]
+
 local DEBUG = false
 local DEBUG_FILE = "/DEBUG/sembat.txt" -- /DEBUG directory must exist unders SD card root
 
