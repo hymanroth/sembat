@@ -6,7 +6,7 @@
 --]]
 
 local DEBUG = false
-local DEBUG_FILE = "/DEBUG/sembat.txt" -- /DEBUG directory must exist unders SD card root
+local DEBUG_FILE = "/DEBUG/sembat.txt" -- /DEBUG directory must exist under SD card root
 
 local ERR_CODE_OK        =  100
 local ERR_CODE_RUN       =  0 -- the script didn't load, not recoverable
