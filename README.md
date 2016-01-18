@@ -13,7 +13,7 @@ When a battery has current drawn from it, the voltage across the battery drops. 
 #### Inputs
 * Cells - You can set the number of cells in your battery via this parameter, and if the transmitter receives a different number, the script will complain via its status code (see below) and issue a low-piched beep. Setting this value to zero (the default) disables cell count checking.
 
-* Thr (%) - This is threshold below which the script is invoked. Note: the scale used is 0 to 100%, not -100% to 100%
+* Thr (%) - This is the threshold below which the script is invoked. Note: the scale used is 0 to 100%, not -100% to 100%
 
 #### Outputs
 * code - This shows the script's status. The minus symbol blinks approximately once per second to show the script is running. The status codes are as follows:
