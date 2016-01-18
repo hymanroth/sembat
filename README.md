@@ -1,5 +1,6 @@
 # sembat
 A battery monitoring script for opentx, designed for use with aeroplanes.
+Requires OpenTX version 2.1.x
 
 ### Features
 * Model battery status announced as percentage charge of lowest cell
