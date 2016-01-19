@@ -45,7 +45,7 @@ STATE[STATE_ACTIVATED]    = {txt = "ACTIVATED",   delay = 0}    --  this state d
 STATE[STATE_CHECKING]     = {txt = "CHECKING",    delay = 1}    --  once activated, check cells every 10 ms
 STATE[STATE_SLEEPING]     = {txt = "SLEEPING",    delay = 10}   --  check if throttle goes back above threshold every 100ms
 
-local SILENCE  = { {75, 6000},  --  if battery is above 75% limit announcemnets to once every 60 seconds
+local SILENCE  = { {75, 6000},  --  if battery is above 75% limit announcements to once every 60 seconds
                    {50, 3000},
                    {40, 1500},
                    {30, 1000},
