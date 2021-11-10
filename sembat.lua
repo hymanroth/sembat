@@ -1,10 +1,11 @@
 --[[
  script:  sembat.lua 
  author:  David Semeria
- version: 1.0
+ version: 1.1
  license: GNU General Public License version 2
 --]]
 
+local VERSION = "1.1"
 local DEBUG = false
 local DEBUG_FILE = "/DEBUG/sembat.txt" -- /DEBUG directory must exist under SD card root
 
@@ -24,8 +25,11 @@ local outputs = {"code", "vlt", "pct"}
 local CELL_ERROR = 3 -- any voltage below this value must be wrong
 
 local BEEP_HIGH = 5000
+local BEEP_MID  =  500
 local BEEP_LOW  =  100
-local BEEP_DUR  =  100
+
+local BEEP_SHORT =  100
+local BEEP_LONG  =  300
 
 local THR_ID  = "thr"
 local CELL_ID = "Cels"
@@ -42,7 +46,7 @@ local STATE = {}
 STATE[STATE_ERROR]        = {txt = "ERROR"}                     --  this is also the initial state 
 STATE[STATE_WAITING_ACT]  = {txt = "WAITING_ACT", delay = 5}    --  if not sleeping, check if throttle is below threshold every 50 ms 
 STATE[STATE_ACTIVATED]    = {txt = "ACTIVATED",   delay = 0}    --  this state does not persist between inovations of run() therefore delay not used 
-STATE[STATE_CHECKING]     = {txt = "CHECKING",    delay = 1}    --  once activated, check cells every 10 ms
+STATE[STATE_CHECKING]     = {txt = "CHECKING",    delay = 10}   --  once activated, check cells every 100 ms
 STATE[STATE_SLEEPING]     = {txt = "SLEEPING",    delay = 10}   --  check if throttle goes back above threshold every 100ms
 
 local SILENCE  = { {75, 6000},  --  if battery is above 75% limit announcements to once every 60 seconds
@@ -67,7 +71,7 @@ local LEVELS   = { {3.50,  3},  -- map: votage -> % charge
                    {4.15, 96},
                    {4.20, 100} }
 
-local CHECK_ITERATIONS = 50  -- on activation, check cell voltages 50 times  
+local CHECK_ITERATIONS = 200  -- on activation, check cell voltages 200 times (at 10 checks per second = 20 seconds)   
 
 local thrId      
 local cellId
@@ -79,7 +83,6 @@ local delay     = 0
 local silence   = 0 
 local announce  = 0 
 local lastTime  = 0
-local lastCheck = 0
 local minCell   = 0
 
 -- output values 
@@ -246,17 +249,19 @@ local function run(cells, minThrottle)
    
     if state == STATE_ACTIVATED then
       if errCode == ERR_CODE_OK then
-        playTone(BEEP_HIGH,BEEP_DUR,0,PLAY_BACKGROUND)
+        if now > announce then
+          playTone(BEEP_HIGH,BEEP_LONG,0,PLAY_BACKGROUND)
+          changeState(delta, STATE_CHECKING)
+          minCell = 0 
+          checkCtr = 0
+        else
+          playTone(BEEP_MID,BEEP_SHORT,0,PLAY_BACKGROUND) 
+          changeState(delta, STATE_SLEEPING)
+        end 
       else 
         scaledMinCell = 0
         scaledPctCell = 0  
-        playTone(BEEP_LOW,BEEP_DUR,0,PLAY_BACKGROUND)
-      end 
-      if errCode == ERR_CODE_OK then 
-        changeState(delta, STATE_CHECKING)
-        minCell = 0 
-        checkCtr = 0
-      else 
+        playTone(BEEP_LOW,BEEP_SHORT,0,PLAY_BACKGROUND)
         changeState(delta, STATE_SLEEPING)
       end 
     end
@@ -265,19 +270,15 @@ local function run(cells, minThrottle)
       checkCtr = checkCtr +1
       if vlt > minCell then minCell = vlt end -- confusing, but correct
       debug("run() ", "delta: ", delta, "\n", "SMT: ", scaledMinThrottle, "\n", "throttle: ", throttle, "\n", "vlt: ", vlt, "\n", "minCell: ", minCell, "\n\n")
-      if checkCtr >= CHECK_ITERATIONS then
+      if checkCtr >= CHECK_ITERATIONS or throttle > scaledMinThrottle then
         local pctCell = getChargePct(minCell)
         scaledMinCell = scale(minCell)
         scaledPctCell = scale(pctCell)  
-        lastCheck = now
         changeState(delta, STATE_SLEEPING) 
         if errCode == ERR_CODE_OK then
-          local newSilence = getSilence(pctCell)
-          if now > announce or silence ~= newSilence then  
-            silence = newSilence
-            announce = now + silence
-            playNumber(pctCell, 13)
-          end
+          silence = getSilence(pctCell)
+          announce = now + silence
+         playNumber(pctCell, 13)
         end 
       end
     end
